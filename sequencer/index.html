@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>app</title>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.js" charset="utf-8">
+	</script>
+	<link rel="stylesheet" href="css/app.css">
+</head>
+<!-- BEGIN App -->
+
+<body>
+	<div class="app-grid">
+	</div>
+	<button class="play-stop-button">
+		Play / Stop
+	</button>
+	<button class="metronome">Toggle metronome</button>
+	<div id="tempoBox">Tempo: <span id="showTempo">120</span>BPM <input id="tempo" type="range" min="30.0" max="160.0"
+			step="1" value="120"  ></div>
+	<script src="js/audiolib.js"></script>
+	<script src="js/app.js"></script>
+</body>
+<!-- END App -->
+
+</html>
