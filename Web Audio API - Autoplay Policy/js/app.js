@@ -1,20 +1,27 @@
 "use strict";
 // for cross browser
-const ctx = new (window.AudioContext || window.webkitAudioContext)();
+// const ctx = new(window.AudioContext || window.webkitAudioContext)();
 
-function Oscillator (frequency, detune) {
-  this.osc = ctx.createOscillator();
-  this.osc.type = 'sawtooth';
-  this.osc.frequency.value = frequency;
-  this.osc.detune.value = detune;
-  this.osc.connect(ctx.destination);
-  this.osc.start(0);
-  this.osc.stop(3);
-}
+// const osc = ctx.createOscillator();
 
-const osc1 = new Oscillator(440, 0);
-const osc2 = new Oscillator(440, 10);
-const osc3 = new Oscillator(440, 15);
+// osc.connect(ctx.destination);
+
+// console.log(ctx.state);
+// console.log(ctx);
+
+const btn = document.querySelector("button");
+
+btn.addEventListener("click", () => {
+  const ctx = new(window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  osc.connect(ctx.destination);
+  osc.start(0);
+  osc.stop(1);
+  osc.onended = () => {
+    console.log(ctx.state);
+  }
+})
+
 
 // const osc = ctx.createOscillator();
 
@@ -35,8 +42,8 @@ const osc3 = new Oscillator(440, 15);
 // }
 // )
 
-document.getElementById("play-button").addEventListener("click", function () {
-  
+/* document.getElementById("play-button").addEventListener("click", function () {
+
   if (ctx.state !== "running") {
     // console.log("it's not running well");
     // oscState = true;
@@ -49,4 +56,4 @@ document.getElementById("play-button").addEventListener("click", function () {
     // console.log(audioCtx.state);
     // audioCtx.onstatechange = () => console.log(audioCtx.state);
   }
-});
+}); */
