@@ -1,8 +1,7 @@
 "use strict";
 
 // for cross browser
-const AudioContext = window.AudioContext || window.webkitaudioCtx;
-const audioCtx = new AudioContext();
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function audioFileLoader(fileDirectory, callback) {
     let soundObj = {};

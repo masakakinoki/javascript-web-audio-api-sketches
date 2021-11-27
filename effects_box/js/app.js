@@ -1,7 +1,6 @@
 "use strict";
 // for cross browser
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 let osc_1;
 let osc_2;
