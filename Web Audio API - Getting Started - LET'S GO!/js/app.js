@@ -2,29 +2,29 @@
 // for cross browser
 const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
-const osc = ctx.createOscillator();
+console.log(ctx);
 
-// console.log(osc);
+// const osc = ctx.createOscillator();
 
-const gain = ctx.createGain();
+// const gain = ctx.createGain();
 
-console.log(gain);
+// console.log(gain);
 
 // osc.type = "sine";
 // osc.type = "square";
 // osc.type = "triangle";
 // osc.type = "sawtooth";
 
-osc.connect(ctx.destination);
+// osc.connect(ctx.destination);
 
-osc.start();
+// osc.start();
 
-setTimeout(() => {
-osc.stop();
-}, 500);
+// setTimeout(() => {
+// osc.stop();
+// }, 500);
 // osc.stop(1);
 
-const frequencyRange = document.querySelector("input");
+// const frequencyRange = document.querySelector("input");
 
 frequencyRange.addEventListener("input", (event) => {
   console.log(event);
