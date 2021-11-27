@@ -67,10 +67,3 @@ document.getElementById("play-button").addEventListener("click", function () {
     // audioCtx.onstatechange = () => console.log(audioCtx.state);
   }
 });
-
-// function touchStarted() {
-//   console.log(audioCtx.state);
-//   if (audioCtx.state !== "running") {
-//     audioCtx.resume();
-//   }
-// }
