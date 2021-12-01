@@ -86,7 +86,6 @@ class Freeverb extends CompositeAudioNode {
 
 
 //create an instance
-// const Freeverb = require('Freeverb')
 // import Freeverb from　'./freeverb';
 const opts = { dampening: 3000, roomSize: 0.8, dryGain: 0.1, wetGain: 1.0 }
 const freeverb = new Freeverb(audioCtx, opts)
