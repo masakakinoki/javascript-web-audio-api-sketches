@@ -31,6 +31,8 @@ convolver.connect(wetGain);
 dryGain.connect(audioCtx.destination);
 wetGain.connect(audioCtx.destination);
 
+//Reverb source https://github.com/adelespinasse/reverbGen
+//Check this application to adjust the params https://aldel.com/reverbgen/
 function doGenerateReverb() {
   var params = {
     fadeInTime: 0.1,
