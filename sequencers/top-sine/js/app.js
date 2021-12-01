@@ -10,12 +10,13 @@ let tempo = 80;
 let secondsPerBeat = 60 / tempo;
 let counterTimeValue = (secondsPerBeat / 4); // 16th note
 let osc = audioCtx.createOscillator();
-let metronomeVolume = audioCtx.createGain();
+let topSineVolume = audioCtx.createGain();
+topSineVolume.gain.value = 0.1;
 
 function playTopSine(time) {
     osc = audioCtx.createOscillator();
-    osc.connect(metronomeVolume);
-    metronomeVolume.connect(audioCtx.destination);
+    osc.connect(topSineVolume);
+    topSineVolume.connect(audioCtx.destination);
     osc.type = "sine";
     osc.frequency.value = 4000;
     if (counter === 1) {
