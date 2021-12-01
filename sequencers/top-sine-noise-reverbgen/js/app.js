@@ -74,7 +74,7 @@ function doGenerateReverb() {
   });
 }
 
-function TriggerDoGenerateReverb(time, playing) {
+function triggerDoGenerateReverb(time, playing) {
   if (playing) {
     if (counter === 1) {
       doGenerateReverb();
@@ -155,7 +155,7 @@ function scheduler() {
   while (futureTickTime < audioCtx.currentTime + scheduleAheadTime) {
     playTopSine(futureTickTime, true);
     playNoise(futureTickTime, true);
-    TriggerDoGenerateReverb(futureTickTime, true);
+    triggerDoGenerateReverb(futureTickTime, true);
     playTick();
   }
   window.setTimeout(scheduler, lookahead);
