@@ -12,11 +12,16 @@ let counterTimeValue = (secondsPerBeat / 4); // 16th note
 
 // Noise volume
 let noiseVolume = audioCtx.createGain();
-noiseVolume.gain.value = 0.001; //Noise volume before send to FX
+noiseVolume.gain.value = 0.1; //Noise volume before send to FX
 
 // Noise parameters
 let noiseDuration = 1.; //Duration of Noise
 let bandHz = 100;
+
+// Biquad filter setup
+const bandpass = audioCtx.createBiquadFilter();
+bandpass.type = 'bandpass';
+bandpass.frequency.value = bandHz;
 
 function playNoise(time, playing) {
   if (playing) {
@@ -33,10 +38,6 @@ function playNoise(time, playing) {
     const noise = audioCtx.createBufferSource();
     noise.buffer = buffer;
 
-    const bandpass = audioCtx.createBiquadFilter();
-    bandpass.type = 'bandpass';
-    bandpass.frequency.value = bandHz;
-
     // connect our graph
     noise.connect(noiseVolume);
     // 1. without a bandpass filter
@@ -44,6 +45,7 @@ function playNoise(time, playing) {
     // 2. with a bandpass filter
     noiseVolume.connect(bandpass).connect(audioCtx.destination);
     if (counter === 1) {
+      // bandpass.gain.setValueAtTime(-40, time);
       noise.start(time);
       // noise.stop(time + noiseDuration);
     }
