@@ -19,16 +19,59 @@ noiseEnv.gain.setValueAtTime(0, audioCtx.currentTime); // start from silence!
 
 // Noise volume
 let noiseVolume = audioCtx.createGain();
-noiseVolume.gain.value = 0.5; //Noise volume before send to FX
+noiseVolume.gain.value = 0.01; //Noise volume before send to FX
 
 // Noise parameters
-let noiseDuration = 4.; //Duration of Noise
-let bandHz = 200;
+let noiseDuration = 5.0; //Duration of Noise
+let bandHz = 4000;
+let bandQ = 10;
 
 // Biquad filter setup
 const bandpass = audioCtx.createBiquadFilter();
 bandpass.type = 'bandpass';
 bandpass.frequency.value = bandHz;
+bandpass.Q.value = bandQ;
+
+// Distortion setup
+let distortion = audioCtx.createWaveShaper();
+
+// Distortion function
+
+// Distortion Type A
+
+// function makeDistortionCurve(amount) {
+//   let k = typeof amount === 'number' ? amount : 50,
+//     n_samples = 44100,
+//     curve = new Float32Array(n_samples),
+//     deg = Math.PI / 180,
+//     i = 0,
+//     x;
+//   for ( ; i < n_samples; ++i ) {
+//     x = i * 2 / n_samples - 1;
+//     curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
+//   }
+//   return curve;
+// };
+
+// Distortion Type B
+
+function makeDistortionCurve(amount) {
+  var k = amount,
+      n_samples = typeof sampleRate === 'number' ? sampleRate : 44100,
+      curve = new Float32Array(n_samples),
+      deg = Math.PI / 180,
+      i = 0,
+      x;
+  for ( ; i < n_samples; ++i ) {
+      x = i * 2 / n_samples - 1;
+      curve[i] = (3 + k)*Math.atan(Math.sinh(x*0.25)*5) / (Math.PI + k * Math.abs(x));
+  }
+  return curve;
+}
+
+// Distortion parameters
+distortion.curve = makeDistortionCurve(400);
+distortion.oversample = '4x';
 
 // Create attack and release functions.
 const attack = (attackTime, decayTime, sustainValue) => {
@@ -49,7 +92,7 @@ const release = (tempReleaseTime) => {
 let attackTime = 0.5;
 let decayTime = 0.5;
 let sustainValue = 0.5;
-let releaseTime = 2.0;
+let releaseTime = 3.5;
 
 let reverbIR;
 let reverbFilename;
@@ -141,6 +184,22 @@ function playTopSine(time, playing) {
   }
 }
 
+function noiseAttackTrigger(time, playing) {
+  if (playing) {
+    if (counter === 1) {
+      attack(attackTime, decayTime, sustainValue);
+    }
+  }
+}
+
+function noiseReleaseTrigger(time, playing) {
+  if (playing) {
+    if (counter === 1) {
+      release(releaseTime);
+    }
+  }
+}
+
 function playNoise(time, playing) {
   if (playing) {
     const bufferSize = audioCtx.sampleRate * noiseDuration; // set the time of the note
@@ -158,12 +217,15 @@ function playNoise(time, playing) {
 
     // connect our graph
     noise.connect(noiseVolume);
-    noiseVolume.connect(noiseEnv);
+    noiseVolume.connect(distortion).connect(noiseEnv);
+    // Without Bandpass Filter
+    // noiseEnv.connect(audioCtx.destination);
+    // With Bandpass Filter
     noiseEnv.connect(bandpass).connect(audioCtx.destination);
     if (counter === 1) {
       noise.start(time);
-      attack(attackTime, decayTime, sustainValue);
-      release(attackTime + decayTime + releaseTime);
+      // attack(attackTime, decayTime, sustainValue);
+      // release(releaseTime);
       console.log("releaseTime: " + releaseTime);
       // noise.stop(time + noiseDuration);
     }
@@ -192,6 +254,8 @@ function scheduler() {
   while (futureTickTime < audioCtx.currentTime + scheduleAheadTime) {
     playTopSine(futureTickTime, true);
     playNoise(futureTickTime, true);
+    noiseAttackTrigger(futureTickTime, true);
+    noiseReleaseTrigger(futureTickTime + attackTime + decayTime, true);
     triggerDoGenerateReverb(futureTickTime, true);
     playTick();
   }
