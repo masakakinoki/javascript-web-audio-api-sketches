@@ -12,7 +12,7 @@ let counterTimeValue = (secondsPerBeat / 4); // 16th note
 
 // Noise volume
 let noiseVolume = audioCtx.createGain();
-noiseVolume.gain.value = 0.01; //Noise volume before send to FX
+noiseVolume.gain.value = 0.001; //Noise volume before send to FX
 
 // Noise parameters
 let noiseDuration = 1.; //Duration of Noise
@@ -39,6 +39,9 @@ function playNoise(time, playing) {
 
     // connect our graph
     noise.connect(noiseVolume);
+    // 1. without a bandpass filter
+    // noiseVolume.connect(audioCtx.destination);
+    // 2. with a bandpass filter
     noiseVolume.connect(bandpass).connect(audioCtx.destination);
     if (counter === 1) {
       noise.start(time);
@@ -65,7 +68,7 @@ function playTick() {
 }
 
 function scheduler() {
-  while (futureTickTime < audioCtx.currentTime + scheduleAheadTime) {
+  if (futureTickTime < audioCtx.currentTime + scheduleAheadTime) {
     playNoise(futureTickTime, true);
     playTick();
   }
