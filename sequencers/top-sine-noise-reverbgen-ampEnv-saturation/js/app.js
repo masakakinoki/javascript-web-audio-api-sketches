@@ -22,7 +22,7 @@ let noiseVolume = audioCtx.createGain();
 noiseVolume.gain.value = 0.5; //Noise volume before send to FX
 
 // Noise parameters
-let noiseDuration = 5.0; //Duration of Noise
+let noiseDuration = 4.; //Duration of Noise
 let bandHz = 200;
 
 // Biquad filter setup
@@ -49,7 +49,7 @@ const release = (tempReleaseTime) => {
 let attackTime = 0.5;
 let decayTime = 0.5;
 let sustainValue = 0.5;
-let releaseTime = 3.5;
+let releaseTime = 2.0;
 
 let reverbIR;
 let reverbFilename;
@@ -141,22 +141,6 @@ function playTopSine(time, playing) {
   }
 }
 
-function noiseAttackTrigger(time, playing) {
-  if (playing) {
-    if (counter === 1) {
-      attack(attackTime, decayTime, sustainValue);
-    }
-  }
-}
-
-function noiseReleaseTrigger(time, playing) {
-  if (playing) {
-    if (counter === 1) {
-      release(releaseTime);
-    }
-  }
-}
-
 function playNoise(time, playing) {
   if (playing) {
     const bufferSize = audioCtx.sampleRate * noiseDuration; // set the time of the note
@@ -178,8 +162,8 @@ function playNoise(time, playing) {
     noiseEnv.connect(bandpass).connect(audioCtx.destination);
     if (counter === 1) {
       noise.start(time);
-      // attack(attackTime, decayTime, sustainValue);
-      // release(releaseTime);
+      attack(attackTime, decayTime, sustainValue);
+      release(attackTime + decayTime + releaseTime);
       console.log("releaseTime: " + releaseTime);
       // noise.stop(time + noiseDuration);
     }
@@ -208,8 +192,6 @@ function scheduler() {
   while (futureTickTime < audioCtx.currentTime + scheduleAheadTime) {
     playTopSine(futureTickTime, true);
     playNoise(futureTickTime, true);
-    noiseAttackTrigger(futureTickTime, true);
-    noiseReleaseTrigger(futureTickTime + attackTime + decayTime, true);
     triggerDoGenerateReverb(futureTickTime, true);
     playTick();
   }
