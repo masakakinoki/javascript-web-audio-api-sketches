@@ -10,9 +10,11 @@ let tempo = 120;
 let secondsPerBeat = 60 / tempo;
 let counterTimeValue = (secondsPerBeat / 4); // 16th note
 
+// Noise volume
 let noiseVolume = audioCtx.createGain();
 noiseVolume.gain.value = 0.01; //Noise volume before send to FX
 
+// Noise parameters
 let noiseDuration = 1.; //Duration of Noise
 let bandHz = 100;
 
