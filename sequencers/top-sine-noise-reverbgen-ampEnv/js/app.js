@@ -6,15 +6,50 @@ const audioCtx = new AudioContext();
 
 let futureTickTime = audioCtx.currentTime;
 let counter = 1;
-let tempo = 120;
+let tempo = 60;
 let secondsPerBeat = 60 / tempo;
 let counterTimeValue = (secondsPerBeat / 4); // 16th note
 let osc = audioCtx.createOscillator();
 let topSineVolume = audioCtx.createGain();
 topSineVolume.gain.value = 0.05; //TopSine volume before send to FX
 
+// Noise Envelope setup
+const noiseEnv = audioCtx.createGain();
+noiseEnv.gain.setValueAtTime(0, audioCtx.currentTime); // start from silence!
+
+// Noise volume
 let noiseVolume = audioCtx.createGain();
-noiseVolume.gain.value = 0.01; //Noise volume before send to FX
+noiseVolume.gain.value = 0.5; //Noise volume before send to FX
+
+// Noise parameters
+let noiseDuration = 4.; //Duration of Noise
+let bandHz = 200;
+
+// Biquad filter setup
+const bandpass = audioCtx.createBiquadFilter();
+bandpass.type = 'bandpass';
+bandpass.frequency.value = bandHz;
+
+// Create attack and release functions.
+const attack = (attackTime, decayTime, sustainValue) => {
+  noiseEnv.gain.setValueAtTime(0, audioCtx.currentTime);
+  noiseEnv.gain.linearRampToValueAtTime(1,
+    audioCtx.currentTime + attackTime);
+  noiseEnv.gain.linearRampToValueAtTime(sustainValue,
+    audioCtx.currentTime + attackTime + decayTime);
+};
+
+const release = (tempReleaseTime) => {
+  noiseEnv.gain.linearRampToValueAtTime(0,
+    audioCtx.currentTime + tempReleaseTime);
+  console.log("tempReleaseTime: " + tempReleaseTime);
+};
+
+// Attack and release functions setup.
+let attackTime = 0.5;
+let decayTime = 0.5;
+let sustainValue = 0.5;
+let releaseTime = 2.0;
 
 let reverbIR;
 let reverbFilename;
@@ -106,9 +141,6 @@ function playTopSine(time, playing) {
   }
 }
 
-let noiseDuration = 1.; //Duration of Noise
-let bandHz = 100;
-
 function playNoise(time, playing) {
   if (playing) {
     const bufferSize = audioCtx.sampleRate * noiseDuration; // set the time of the note
@@ -124,16 +156,16 @@ function playNoise(time, playing) {
     const noise = audioCtx.createBufferSource();
     noise.buffer = buffer;
 
-    const bandpass = audioCtx.createBiquadFilter();
-    bandpass.type = 'bandpass';
-    bandpass.frequency.value = bandHz;
-
     // connect our graph
     noise.connect(noiseVolume);
-    noiseVolume.connect(bandpass).connect(audioCtx.destination);
+    noiseVolume.connect(noiseEnv);
+    noiseEnv.connect(bandpass).connect(audioCtx.destination);
     if (counter === 1) {
       noise.start(time);
-      // noise.stop(time + 0.1);
+      attack(attackTime, decayTime, sustainValue);
+      release(attackTime + decayTime + releaseTime);
+      console.log("releaseTime: " + releaseTime);
+      // noise.stop(time + noiseDuration);
     }
   }
 }
