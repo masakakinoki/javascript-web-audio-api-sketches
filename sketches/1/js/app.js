@@ -11,12 +11,12 @@ let tempo = 60;
 let secondsPerBeat = 60 / tempo;
 let counterTimeValue = (secondsPerBeat / 4); // 16th note
 let osc = audioCtx.createOscillator();
-let topSineVolume = audioCtx.createGain();
-topSineVolume.gain.value = 0.05; //TopSine volume before send to FX
+let topSinePreGain = audioCtx.createGain();
+topSinePreGain.gain.value = 0.1; //TopSine volume before send to FX
 
 let noiseReverbParams = {
   fadeInTime: 0.1,
-  decayTime: 0.5,
+  decayTime: 0.4,
   sampleRate: 48000,
   lpFreqStart: 15000,
   lpFreqEnd: 1000,
@@ -29,7 +29,7 @@ noiseEnv.gain.setValueAtTime(0, audioCtx.currentTime); // start from silence!
 
 // Noise volume
 let noisePreGain = audioCtx.createGain();
-noisePreGain.gain.value = 0.5; //Noise volume before send to FX
+noisePreGain.gain.value = 0.4; //Noise volume before send to FX
 
 // Noise parameters
 let initialNoiseDuration = 0.1
@@ -137,7 +137,7 @@ noiseDryGain.connect(audioCtx.destination);
 noiseWetGain.connect(audioCtx.destination);
 
 // FX wetGain
-dryGain.gain.value = 1.0;
+dryGain.gain.value = 1.5;
 wetGain.gain.value = 0.5;
 noiseDryGain.gain.calue = 1.0; //The amount of gain to apply. This parameter is a-rate and it's nominal range is (-∞,+∞). The default is 1.
 noiseWetGain.gain.calue = -2.0; //The amount of gain to apply. This parameter is a-rate and it's nominal range is (-∞,+∞). The default is 1.
@@ -207,9 +207,9 @@ function triggerDoGenerateReverb(time, playing) {
 function playTopSine(time, playing) {
   if (playing) {
     osc = audioCtx.createOscillator();
-    osc.connect(topSineVolume);
-    topSineVolume.connect(convolver);
-    topSineVolume.connect(dryGain);
+    osc.connect(topSinePreGain);
+    topSinePreGain.connect(convolver);
+    topSinePreGain.connect(dryGain);
     osc.type = "sine";
     osc.frequency.value = 4000;
     // if (counter === 1) {
@@ -352,8 +352,8 @@ document.getElementById("play-button").addEventListener("click", function () {
   }
 });
 
+// Page load
 window.onload = (event) => {
   console.log('page is fully loaded');
   audioCtx.suspend();
-  // init();
 };
